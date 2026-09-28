@@ -8,7 +8,7 @@
 :root{
   --primary:#0b5e7c;--primary-dark:#07455b;--primary-light:#e6f2f7;
   --accent:#12b5d0;--accent-light:#d4f2f5;--dark:#1a2a32;
-  --gray:#5a6a72;--light:#f8fbfc;--white:#fff;
+  --gray:#5a6a72;--gray-light:#8a9aa2;--light:#f8fbfc;--white:#fff;
   --radius:16px;--radius-sm:10px;
   --shadow:0 10px 40px rgba(11,94,124,.10);
   --shadow-hover:0 20px 60px rgba(11,94,124,.18);
@@ -67,16 +67,37 @@ section.alt{background:var(--light)}
 .acc-plus{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:400;line-height:1;transition:transform .3s ease,background .2s}
 .acc-item.open .acc-plus{transform:rotate(45deg);background:var(--accent);color:#fff}
 .acc-body{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s ease;padding:0 22px;color:var(--gray);font-size:14px}
-.acc-item.open .acc-body{max-height:900px;padding:0 22px 22px}
+.acc-item.open .acc-body{max-height:1200px;padding:0 22px 22px}
 .acc-body p{margin-bottom:10px;color:var(--dark)}
 .acc-body ul{list-style:none}
 .acc-body ul li{padding:7px 0 7px 22px;position:relative;border-bottom:1px dashed #eef3f5;font-size:13.5px;color:var(--dark)}
 .acc-body ul li:last-child{border-bottom:none}
 .acc-body ul li::before{content:'✓';position:absolute;left:0;color:var(--accent);font-weight:800}
 
+/* ============ FEATURE BLOCK (фото + текст) ============ */
+.feature-block{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center;margin-bottom:70px}
+.feature-block:last-child{margin-bottom:0}
+.feature-block.reverse .feature-media{order:2}
+.feature-media{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);background:var(--light)}
+.feature-media img{width:100%;height:420px;object-fit:cover;display:block}
+.feature-content h3{font-size:26px;color:var(--primary);margin-bottom:14px;font-weight:800}
+.feature-content > p{color:var(--gray);font-size:16px;margin-bottom:20px}
+.feature-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.feature-list li{background:var(--light);padding:12px 14px;border-radius:10px;border-left:3px solid var(--accent);font-size:13.5px;color:var(--dark)}
+.feature-list li strong{display:block;color:var(--primary);margin-bottom:3px;font-size:13.5px}
+
+/* ============ SCREENSHOT GALLERY ============ */
+.shots-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:28px}
+.shot{background:#fff;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);border:1px solid #e6eef2;transition:.25s}
+.shot:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover);border-color:var(--accent)}
+.shot img{width:100%;height:auto;display:block}
+.shot-caption{padding:18px 22px;background:#fff}
+.shot-caption h4{font-size:16px;color:var(--primary);margin-bottom:6px;font-weight:700}
+.shot-caption p{font-size:13.5px;color:var(--gray);line-height:1.5}
+
 /* ============ REGIONS MAP ============ */
 .regions-wrap{display:grid;grid-template-columns:1.3fr 1fr;gap:40px;align-items:center;background:#fff;border-radius:var(--radius);padding:36px;box-shadow:var(--shadow)}
-.regions-map{border-radius:var(--radius-sm);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.regions-map{border-radius:var(--radius-sm);overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d2540 0%,#143c63 100%);padding:20px}
 .regions-map img{width:100%;height:auto;display:block;border-radius:var(--radius-sm)}
 .regions-list h3{color:var(--primary);font-size:20px;margin-bottom:16px}
 .regions-list p{color:var(--gray);font-size:14px;margin-bottom:16px}
@@ -105,7 +126,9 @@ section.alt{background:var(--light)}
   .acc-list{grid-template-columns:repeat(2,1fr)}
   .adv-grid{grid-template-columns:repeat(3,1fr)}
   .stats-grid{grid-template-columns:repeat(2,1fr)}
-  .regions-wrap{grid-template-columns:1fr;gap:28px}
+  .regions-wrap,.feature-block{grid-template-columns:1fr;gap:28px}
+  .feature-block.reverse .feature-media{order:0}
+  .shots-grid{grid-template-columns:1fr}
 }
 @media(max-width:768px){
   section{padding:50px 0}
@@ -113,6 +136,7 @@ section.alt{background:var(--light)}
   .hero-grid{grid-template-columns:1fr;gap:32px}.hero-image img{height:260px}
   .section-title{font-size:24px}.section-sub{font-size:16px;margin-bottom:32px}
   .acc-list,.adv-grid,.stats-grid{grid-template-columns:1fr}
+  .feature-list{grid-template-columns:1fr}
   .burger{display:block}
   nav.main-nav{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;flex-direction:column;padding:16px;box-shadow:var(--shadow);gap:4px}
   nav.main-nav.open{display:flex}
@@ -124,6 +148,7 @@ section.alt{background:var(--light)}
   .acc-item.open .acc-body{padding:0 18px 18px}
   .regions-wrap{padding:22px}
   .logo img{height:48px}
+  .feature-media img{height:280px}
 }
 </style>
 </head>
@@ -132,7 +157,7 @@ section.alt{background:var(--light)}
 <!-- ============ ШАПКА ============ -->
 <header>
   <div class="container header-inner">
-    <a href="#top" class="logo" aria-label="МИС qMS — медицинская информационная система">
+    <a href="#top" class="logo" aria-label="МИС qMS">
       <img src="qms-logo.png" alt="МИС qMS — медицинская информационная система">
     </a>
     <button class="burger" id="burger" aria-label="Меню">☰</button>
@@ -903,8 +928,85 @@ section.alt{background:var(--light)}
   </div>
 </section>
 
+<!-- ============ ГАЛЕРЕЯ ЭКРАНОВ ============ -->
+<section id="gallery" class="alt">
+  <div class="container">
+    <div class="center">
+      <span class="section-tag">Интерфейс</span>
+      <h2 class="section-title">Как выглядит qMS в работе</h2>
+      <p class="section-sub">Реальные экраны системы: от регистрации пациента до управления стационаром и операционным блоком.</p>
+    </div>
+
+    <div class="shots-grid">
+      <div class="shot">
+        <img src="qms-registration.png" alt="Регистрация пациента в системе qMS">
+        <div class="shot-caption">
+          <h4>Регистрация пациента</h4>
+          <p>Единая форма регистрации с полями, словарями и сверкой полиса ОМС.</p>
+        </div>
+      </div>
+
+      <div class="shot">
+        <img src="qms-emd.png" alt="Электронный медицинский документооборот">
+        <div class="shot-caption">
+          <h4>Электронный документооборот</h4>
+          <p>Просмотр подписанных документов, направлений и ЭЦП прямо из системы.</p>
+        </div>
+      </div>
+
+      <div class="shot">
+        <img src="qms-schedule.png" alt="Расписание работы кабинетов и специалистов">
+        <div class="shot-caption">
+          <h4>Расписание кабинетов и специалистов</h4>
+          <p>Цветовая индикация занятости, поиск и запись с учётом длительности назначений.</p>
+        </div>
+      </div>
+
+      <div class="shot">
+        <img src="qms-operation.png" alt="Управление операционными">
+        <div class="shot-caption">
+          <h4>Управление операционными</h4>
+          <p>Планирование столов, пациенты операционного дня, контроль выполнения.</p>
+        </div>
+      </div>
+
+      <div class="shot">
+        <img src="qms-beds.png" alt="Управление коечным фондом">
+        <div class="shot-caption">
+          <h4>Управление коечным фондом</h4>
+          <p>Визуализация коек по отделениям, планирование госпитализаций.</p>
+        </div>
+      </div>
+
+      <div class="shot">
+        <img src="qms-monitoring.png" alt="Интеграция с реанимационным оборудованием">
+        <div class="shot-caption">
+          <h4>Мониторинг в реанимации</h4>
+          <p>Автоматический сбор показателей АД, пульса, SpO2 и температуры с приборов.</p>
+        </div>
+      </div>
+
+      <div class="shot">
+        <img src="qms-waiting-list.png" alt="Лист ожидания">
+        <div class="shot-caption">
+          <h4>Лист ожидания</h4>
+          <p>Приоритет очереди, согласование направлений и резервирование мест.</p>
+        </div>
+      </div>
+
+      <div class="shot">
+        <img src="qms-finance.png" alt="Финансовая аналитика">
+        <div class="shot-caption">
+          <h4>Финансовая аналитика</h4>
+          <p>Реестр пролеченных больных, баланс дохода и себестоимости по случаю.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ============ ИНТЕГРАЦИИ ============ -->
-<section id="integrations" class="alt">
+<section id="integrations">
   <div class="container">
     <div class="center">
       <span class="section-tag">Интеграции</span>
@@ -1118,7 +1220,7 @@ section.alt{background:var(--light)}
 </section>
 
 <!-- ============ БЕЗОПАСНОСТЬ ============ -->
-<section id="security">
+<section id="security" class="alt">
   <div class="container">
     <div class="center">
       <span class="section-tag">Безопасность</span>
@@ -1238,7 +1340,7 @@ section.alt{background:var(--light)}
 </section>
 
 <!-- ============ АНАЛИТИКА ============ -->
-<section id="analytics" class="alt">
+<section id="analytics">
   <div class="container">
     <div class="center">
       <span class="section-tag">Аналитика</span>
@@ -1404,7 +1506,7 @@ section.alt{background:var(--light)}
 </section>
 
 <!-- ============ КЛИЕНТЫ ============ -->
-<section id="clients">
+<section id="clients" class="alt">
   <div class="container">
     <div class="center">
       <span class="section-tag">Клиенты</span>
