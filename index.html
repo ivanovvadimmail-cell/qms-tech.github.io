@@ -130,130 +130,383 @@ section.alt{background:var(--light)}
   .regions-wrap{padding:22px}
   .logo img{height:48px}
 }
+
+/* ===== PRESENTATION REDESIGN ===== */
+.hero{padding:76px 0 84px;min-height:590px;display:flex;align-items:center}
+.hero h1{max-width:760px;font-size:52px}
+.hero-lead{font-size:20px;line-height:1.55;max-width:720px;margin:0 0 18px;color:var(--dark)}
+.hero-lead.small{font-size:17px;color:var(--gray);max-width:680px}
+.hero-panel{background:rgba(255,255,255,.86);border:1px solid #dcecf1;border-radius:24px;padding:28px;box-shadow:var(--shadow)}
+.hero-panel-title{font-size:21px;font-weight:800;color:var(--primary);margin-bottom:18px}
+.hero-points{display:grid;gap:12px}
+.hero-points>div{display:grid;grid-template-columns:42px 1fr;column-gap:12px;padding:14px;border-radius:14px;background:var(--light)}
+.hero-points span{grid-row:1 / span 2;font-size:12px;font-weight:800;color:var(--accent);padding-top:3px}
+.hero-points strong{font-size:16px}
+.hero-points small{color:var(--gray);line-height:1.45;margin-top:2px}
+.management-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:38px}
+.management-card{padding:24px;border:1px solid #e3edf0;border-radius:18px;background:#fff;box-shadow:0 6px 24px rgba(11,94,124,.06)}
+.management-icon{width:42px;height:42px;border-radius:12px;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:800;margin-bottom:14px}
+.management-card h3{font-size:18px;margin-bottom:8px;color:var(--primary)}
+.management-card p{font-size:14.5px;color:var(--gray);line-height:1.55}
+section{scroll-margin-top:92px}
+.section-title{max-width:900px;margin-left:auto;margin-right:auto}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr;gap:34px}.hero h1{font-size:42px}.management-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.hero{padding:52px 0}.hero h1{font-size:34px}.hero-lead{font-size:17px}.management-grid{grid-template-columns:1fr}.hero-panel{padding:20px}}
 </style>
 </head>
 <body>
-
-<!-- ============ ШАПКА ============ -->
 <header>
   <div class="container header-inner">
-    <a href="#top" class="logo" aria-label="МИС qMS">
-      <img src="images/qms-logo.png" alt="МИС qMS — медицинская информационная система">
-    </a>
+    <div class="logo"><img src="images/qms-logo.png" alt="qMS"></div>
     <button class="burger" id="burger" aria-label="Меню">☰</button>
     <nav class="main-nav" id="mainNav">
-      <a href="#about">О системе</a>
-      <a href="#features">Возможности</a>
-      <a href="#modules">Модули</a>
-      <a href="#integrations">Интеграции</a>
-      <a href="#security">Безопасность</a>
+      <a href="#top">Главное</a>
+      <a href="#about">Для клиники</a>
+      <a href="#security">Качество и безопасность</a>
       <a href="#analytics">Аналитика</a>
-      <a href="#clients">Клиенты</a>
+      <a href="#features">Процессы</a>
+      <a href="#modules">Компоненты</a>
+      <a href="#gallery">Интерфейсы</a>
+      <a href="#integrations">Интеграции</a>
+      <a href="#clients">Масштаб</a>
     </nav>
   </div>
 </header>
-
-<!-- ============ HERO ============ -->
 <section class="hero" id="top">
-  <div class="container hero-grid">
-    <div>
-      <h1>МИС <span>qMS</span> — единая цифровая среда клиники</h1>
-      <p class="lead">Полнофункциональная медицинская информационная система, которая объединяет руководителей, медперсонал, лаборатории, страховые организации и пациентов в одном информационном пространстве.</p>
-    </div>
-    <div class="hero-image">
-      <img src="images/qms-1.jpg" alt="Врач работает с МИС qMS">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <span class="hero-badge">Медицинская информационная система</span>
+        <h1>МИС qMS — единая цифровая платформа медицинской организации</h1>
+        <p class="hero-lead">qMS объединяет клинические, диагностические, административные и финансовые процессы в едином информационном пространстве.</p>
+        <p class="hero-lead small">Система помогает видеть работу клиники целиком: от данных пациента и выполнения назначений до качества медицинской помощи, загрузки ресурсов и финансовых показателей.</p>
+      </div>
+      <div class="hero-panel">
+        <div class="hero-panel-title">Единый контур управления</div>
+        <div class="hero-points">
+          <div><span>01</span><strong>Клинические процессы</strong><small>ЭМК, назначения, диагностика, стационар, операционные, реанимация</small></div>
+          <div><span>02</span><strong>Управление</strong><small>Ресурсы, расписание, коечный фонд, аналитика, отчётность, финансы</small></div>
+          <div><span>03</span><strong>Качество и безопасность</strong><small>Идентификация, контроль назначений, риски, тревожные результаты</small></div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
-
-<!-- ============ О СИСТЕМЕ ============ -->
 <section id="about">
   <div class="container">
     <div class="center">
-      <span class="section-tag">О системе</span>
-      <h2 class="section-title">Что такое МИС qMS</h2>
-      <p class="section-sub">qMS структурирует все основные информационно-аналитические процессы учреждения и адаптируется под клинику любого масштаба — от частного кабинета до региональной сети.</p>
+      <span class="section-tag">qMS для медицинской организации</span>
+      <h2 class="section-title">Одна система — единая картина работы клиники</h2>
+      <p class="section-sub">qMS структурирует основные информационно-аналитические процессы учреждения и адаптируется под организацию любого масштаба.</p>
     </div>
 
-    <div class="acc-list">
-      <div class="acc-item">
-        <div class="acc-head">
-          <div class="acc-head-left"><span class="acc-icon">🎯</span><h3>Единое информационное пространство</h3></div>
-          <span class="acc-plus">+</span>
-        </div>
-        <div class="acc-body">
-          <p>Объединяет руководителей клиник, медперсонал, лабораторные службы, страховые организации и пациентов.</p>
-          <ul>
-            <li>Универсально для организаций разных профилей</li>
-            <li>Доступно с разных устройств</li>
-            <li>Прозрачность бизнес-процессов</li>
-            <li>Оптимизация материальных и трудовых ресурсов</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="acc-item">
-        <div class="acc-head">
-          <div class="acc-head-left"><span class="acc-icon">📈</span><h3>Масштаб внедрения</h3></div>
-          <span class="acc-plus">+</span>
-        </div>
-        <div class="acc-body">
-          <p>qMS внедрена более чем в 300 клиниках, больницах и лабораториях.</p>
-          <ul>
-            <li>Красноярский край: 160 медорганизаций, 15 000 рабочих мест</li>
-            <li>Камчатский край: 49 медорганизаций, 5 000 рабочих мест</li>
-            <li>Крупнейшие НМИЦ и университетские клиники</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="acc-item">
-        <div class="acc-head">
-          <div class="acc-head-left"><span class="acc-icon">🚀</span><h3>Масштабируемость и развитие</h3></div>
-          <span class="acc-plus">+</span>
-        </div>
-        <div class="acc-body">
-          <p>Система развивается вместе с клиникой и учитывает актуальные тренды медицинской информатизации.</p>
-          <ul>
-            <li>Два релиза обновлений в год</li>
-            <li>Учёт изменений нормативно-справочной базы</li>
-            <li>Расширение функциональности под конкретные запросы</li>
-            <li>Локализация интерфейса (английский, чешский и др.)</li>
-          </ul>
-        </div>
-      </div>
+    <div class="management-grid">
+      <div class="management-card"><div class="management-icon">◉</div><h3>Единое информационное пространство</h3><p>Объединяет руководителей, медицинский персонал, лабораторные службы, страховые организации и пациентов.</p></div>
+      <div class="management-card"><div class="management-icon">▣</div><h3>Прозрачность процессов</h3><p>Данные о пациенте, работе подразделений и ключевых процессах доступны в единой системе.</p></div>
+      <div class="management-card"><div class="management-icon">↗</div><h3>Оптимизация ресурсов</h3><p>Система поддерживает управление материальными и трудовыми ресурсами, расписанием и коечным фондом.</p></div>
+      <div class="management-card"><div class="management-icon">✓</div><h3>Поддержка качества</h3><p>Контроль назначений, оценка рисков, тревожные результаты и регистрация неблагоприятных событий встроены в рабочие процессы.</p></div>
+      <div class="management-card"><div class="management-icon">⌁</div><h3>Развитие системы</h3><p>Два релиза обновлений в год, учёт изменений нормативно-справочной базы и расширение функциональности под запросы организации.</p></div>
+      <div class="management-card"><div class="management-icon">◫</div><h3>Масштабируемость</h3><p>qMS используется в клиниках, больницах и лабораториях, включая крупные федеральные и региональные проекты.</p></div>
     </div>
 
     <div class="stats-band">
       <div class="stats-grid">
         <div><div class="stat-number">300+</div><div class="stat-label">клиник и лабораторий</div></div>
-        <div><div class="stat-number">160</div><div class="stat-label">организаций в регионе</div></div>
-        <div><div class="stat-number">15 000</div><div class="stat-label">рабочих мест</div></div>
+        <div><div class="stat-number">160</div><div class="stat-label">организаций в региональном проекте</div></div>
+        <div><div class="stat-number">15 000</div><div class="stat-label">рабочих мест в региональном проекте</div></div>
         <div><div class="stat-number">30+</div><div class="stat-label">лет опыта информатизации</div></div>
-      </div>
-    </div>
-
-    <!-- Конкурентные преимущества -->
-    <div style="margin-top:60px">
-      <h3 style="color:var(--primary);font-size:24px;margin-bottom:22px;text-align:center">Конкурентные преимущества</h3>
-      <div class="adv-grid">
-        <div class="adv-card"><div class="adv-icon">📊</div><h3>Постоянное развитие</h3></div>
-        <div class="adv-card"><div class="adv-icon">📐</div><h3>Масштабируемость</h3></div>
-        <div class="adv-card"><div class="adv-icon">🧩</div><h3>Функциональность</h3></div>
-        <div class="adv-card"><div class="adv-icon">⚙️</div><h3>Гибкость</h3></div>
-        <div class="adv-card"><div class="adv-icon">📉</div><h3>Аналитика</h3></div>
       </div>
     </div>
   </div>
 </section>
+<section id="security" class="alt">
+  <div class="container">
+    <div class="center">
+      <span class="section-tag">Качество и безопасность</span>
+      <h2 class="section-title">Качество и безопасность медицинской помощи</h2>
+      <p class="section-sub">Точная идентификация пациента на всех этапах, контроль выполнения назначений и защита данных.</p>
+    </div>
 
-<!-- ============ ВОЗМОЖНОСТИ ============ -->
+    <div class="acc-list">
+      <div class="acc-item">
+        <div class="acc-head">
+          <div class="acc-head-left"><span class="acc-icon">🆔</span><h3>Идентификация пациента</h3></div>
+          <span class="acc-plus">+</span>
+        </div>
+        <div class="acc-body">
+          <p>Браслеты со штрих-кодом на всех этапах.</p>
+          <ul>
+            <li>Использование браслетов со штрих-кодом</li>
+            <li>Сканирование при заборе биоматериала</li>
+            <li>Подтверждение личности перед процедурой</li>
+            <li>Снижение риска врачебных ошибок</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head">
+          <div class="acc-head-left"><span class="acc-icon">✅</span><h3>Контроль выполнения назначений</h3></div>
+          <span class="acc-plus">+</span>
+        </div>
+        <div class="acc-body">
+          <p>Подтверждение каждой манипуляции через сканирование.</p>
+          <ul>
+            <li>Сканирование браслета пациента</li>
+            <li>Сканирование упаковки препарата</li>
+            <li>Подтверждение выдачи лекарства</li>
+            <li>Проверка соответствия «пациент — препарат»</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head">
+          <div class="acc-head-left"><span class="acc-icon">⚠️</span><h3>Сигнальная информация о пациенте</h3></div>
+          <span class="acc-plus">+</span>
+        </div>
+        <div class="acc-body">
+          <p>Важные отметки, видимые врачу.</p>
+          <ul>
+            <li>Маломобильный пациент</li>
+            <li>Прикрепление к медорганизации</li>
+            <li>Критическое снижение СКФ</li>
+            <li>Пациент из льготной категории</li>
+            <li>Лекарственная непереносимость</li>
+            <li>Состояние диспансеризации</li>
+            <li>Диспансерное наблюдение</li>
+            <li>Подозрение на онкозаболевание</li>
+            <li>Необходимость флюорографии</li>
+            <li>Нет этапного эпикриза в срок</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head">
+          <div class="acc-head-left"><span class="acc-icon">📊</span><h3>Оценка рисков</h3></div>
+          <span class="acc-plus">+</span>
+        </div>
+        <div class="acc-body">
+          <p>Автоматический расчёт рисков для пациента.</p>
+          <ul>
+            <li>Риск падений</li>
+            <li>Потеря веса более 5%</li>
+            <li>Риск тромбоэмболических осложнений и венозных тромбозов</li>
+            <li>Риск развития пролежней</li>
+            <li>Тяжесть повреждений</li>
+            <li>Наличие полирезистентной микрофлоры</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head">
+          <div class="acc-head-left"><span class="acc-icon">🚨</span><h3>Тревожные результаты</h3></div>
+          <span class="acc-plus">+</span>
+        </div>
+        <div class="acc-body">
+          <p>Уведомление о критических лабораторных показателях.</p>
+          <ul>
+            <li>Автоматическая отметка «тревожный результат»</li>
+            <li>Уведомление лечащего врача</li>
+            <li>Возможность ознакомления или отложения</li>
+            <li>Пример: калий 15,00 ммоль/л (норма 3,50–5,50)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head">
+          <div class="acc-head-left"><span class="acc-icon">🛡️</span><h3>Соответствие требованиям</h3></div>
+          <span class="acc-plus">+</span>
+        </div>
+        <div class="acc-body">
+          <p>Сертификация и соответствие нормативам РФ.</p>
+          <ul>
+            <li>Регистрационное удостоверение № РЗН 2019/9419</li>
+            <li>Единый реестр российского ПО (№ 916)</li>
+            <li>Требования к МИС Минздрава РФ</li>
+            <li>ГОСТ Р 52636-2006 «Электронная история болезни»</li>
+            <li>152-ФЗ «О персональных данных»</li>
+            <li>Приказ Минздрава №911н</li>
+            <li>Сертификат совместимости с Astra Linux</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="analytics">
+  <div class="container">
+    <div class="center">
+      <span class="section-tag">Аналитика</span>
+      <h2 class="section-title">Управление на основе данных</h2>
+      <p class="section-sub">Полная картина работы клиники: ресурсы, нагрузка, хирургическая работа, качество медицинской помощи и финансовые показатели.</p>
+    </div>
+
+    <div class="acc-list">
+      <div class="acc-item">
+        <div class="acc-head">
+          <div class="acc-head-left"><span class="acc-icon">🏥</span><h3>Мониторинг коечного фонда</h3></div>
+          <span class="acc-plus">+</span>
+        </div>
+        <div class="acc-body">
+          <p>Загрузка коек по отделениям и в динамике.</p>
+          <ul>
+            <li>Общая загрузка стационара</li>
+            <li>Данные по каждому отделению</li>
+            <li>Визуализация состояния коек</li>
+            <li>Оперативное реагирование</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head">
+          <div class="acc-head-left"><span class="acc-icon">👨‍⚕️</span><h3>Загрузка специалистов</h3></div>
+          <span class="acc-plus">+</span>
+        </div>
+        <div class="acc-body">
+          <p>Работа консультативной службы.</p>
+          <ul>
+            <li>Количество приёмов по врачам</li>
+            <li>Загрузка кабинетов</li>
+            <li>Мониторинг по услугам</li>
+            <li>Расписание и занятость</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head">
+          <div class="acc-head-left"><span class="acc-icon">🔪</span><h3>Хирургическая работа</h3></div>
+          <span class="acc-plus">+</span>
+        </div>
+        <div class="acc-body">
+          <p>Мониторинг операций и осложнений.</p>
+          <ul>
+            <li>Назначено, отменено, выполнено</li>
+            <li>Плановые и экстренные операции</li>
+            <li>Причины отмены</li>
+            <li>По виду субкатегории</li>
+            <li>По виду анестезии</li>
+            <li>По операционному залу</li>
+            <li>Контроль послеоперационных осложнений</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head">
+          <div class="acc-head-left"><span class="acc-icon">💰</span><h3>Финансовый анализ</h3></div>
+          <span class="acc-plus">+</span>
+        </div>
+        <div class="acc-body">
+          <p>Объёмы услуг по источникам финансирования.</p>
+          <ul>
+            <li>ОМС, ДМС, ВМП, наличные, ФСС</li>
+            <li>Реестр пролеченных больных</li>
+            <li>Баланс дохода и себестоимости по случаю</li>
+            <li>Выявление случаев с отрицательным балансом</li>
+            <li>Финансовая карточка случая</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head">
+          <div class="acc-head-left"><span class="acc-icon">✅</span><h3>Экспертиза качества</h3></div>
+          <span class="acc-plus">+</span>
+        </div>
+        <div class="acc-body">
+          <p>Протоколы и автоматизированная экспертиза.</p>
+          <ul>
+            <li>Протокол экспертизы качества медпомощи</li>
+            <li>Коэффициент качества (0 – 1)</li>
+            <li>Автоматизированная экспертиза по приказу 203н</li>
+            <li>Оценка по критериям (выполнено / не выполнено)</li>
+            <li>Регистрация неблагоприятных событий</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head">
+          <div class="acc-head-left"><span class="acc-icon">📋</span><h3>Экспертиза нетрудоспособности</h3></div>
+          <span class="acc-plus">+</span>
+        </div>
+        <div class="acc-body">
+          <p>Работа с листами нетрудоспособности.</p>
+          <ul>
+            <li>Случаи временной нетрудоспособности</li>
+            <li>Направление на ВК и МСЭ</li>
+            <li>Номер бланка и дата выдачи</li>
+            <li>Причина нетрудоспособности и диагноз</li>
+            <li>Сводка по листам и врачам</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head">
+          <div class="acc-head-left"><span class="acc-icon">📊</span><h3>Анализ данных по эпизодам</h3></div>
+          <span class="acc-plus">+</span>
+        </div>
+        <div class="acc-body">
+          <p>Гибкие выборки и сохранённые условия.</p>
+          <ul>
+            <li>Новые, действующие, поступления</li>
+            <li>Выписки и направления</li>
+            <li>Диагнозы и результаты лечения</li>
+            <li>Графики и диаграммы</li>
+            <li>Архив и печать выборок</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head">
+          <div class="acc-head-left"><span class="acc-icon">📈</span><h3>Реестр пролеченных больных</h3></div>
+          <span class="acc-plus">+</span>
+        </div>
+        <div class="acc-body">
+          <p>Полный реестр с финансовыми показателями.</p>
+          <ul>
+            <li>№ п/п, отделение, ФИО пациента</li>
+            <li>Вид оплаты, дата поступления и выписки</li>
+            <li>Койко-дни, стоимость пребывания</li>
+            <li>Реанимация, операции, наркоз</li>
+            <li>Медикаменты по источникам</li>
+            <li>Итог и баланс по каждому случаю</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <div class="acc-head">
+          <div class="acc-head-left"><span class="acc-icon">📑</span><h3>Статистическая отчётность</h3></div>
+          <span class="acc-plus">+</span>
+        </div>
+        <div class="acc-body">
+          <p>Федеральные формы в электронном виде.</p>
+          <ul>
+            <li>Форма №12 «Сведения о числе заболеваний»</li>
+            <li>Формы Росстата и Минздрава</li>
+            <li>Возможность предоставления в электронном виде</li>
+            <li>Годовые и периодические отчёты</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 <section id="features" class="alt">
   <div class="container">
     <div class="center">
       <span class="section-tag">Возможности</span>
-      <h2 class="section-title">Функциональность системы</h2>
-      <p class="section-sub">Полный охват клинических, диагностических, административных и финансовых процессов. Нажмите «+», чтобы увидеть детали.</p>
+      <h2 class="section-title">Клинический и управленческий контур</h2>
+      <p class="section-sub">Ключевые процессы медицинской организации в едином цифровом контуре — от регистрации пациента до лечения, диагностики и документооборота.</p>
     </div>
 
     <div class="acc-list">
@@ -499,13 +752,11 @@ section.alt{background:var(--light)}
     </div>
   </div>
 </section>
-
-<!-- ============ МОДУЛИ ============ -->
 <section id="modules">
   <div class="container">
     <div class="center">
       <span class="section-tag">Модули</span>
-      <h2 class="section-title">Функциональные компоненты</h2>
+      <h2 class="section-title">24 функциональных компонента</h2>
       <p class="section-sub">24 модуля покрывают все ключевые процессы медицинской организации. Нажмите «+» для подробностей.</p>
     </div>
 
@@ -901,13 +1152,11 @@ section.alt{background:var(--light)}
     </div>
   </div>
 </section>
-
-<!-- ============ ГАЛЕРЕЯ ЭКРАНОВ ============ -->
 <section id="gallery" class="alt">
   <div class="container">
     <div class="center">
       <span class="section-tag">Интерфейс</span>
-      <h2 class="section-title">Как выглядит qMS в работе</h2>
+      <h2 class="section-title">qMS в работе: ключевые рабочие места</h2>
       <p class="section-sub">Реальные экраны системы: от регистрации пациента до управления стационаром и операционным блоком.</p>
     </div>
 
@@ -978,13 +1227,11 @@ section.alt{background:var(--light)}
     </div>
   </div>
 </section>
-
-<!-- ============ ИНТЕГРАЦИИ ============ -->
 <section id="integrations">
   <div class="container">
     <div class="center">
       <span class="section-tag">Интеграции</span>
-      <h2 class="section-title">Готовые интеграционные протоколы</h2>
+      <h2 class="section-title">Единый цифровой контур и интеграции</h2>
       <p class="section-sub">qMS обменивается данными с государственными сервисами, лабораторным и диагностическим оборудованием, а также внешними системами.</p>
     </div>
 
@@ -1192,299 +1439,11 @@ section.alt{background:var(--light)}
     </div>
   </div>
 </section>
-
-<!-- ============ БЕЗОПАСНОСТЬ ============ -->
-<section id="security" class="alt">
-  <div class="container">
-    <div class="center">
-      <span class="section-tag">Безопасность</span>
-      <h2 class="section-title">Идентификация и контроль</h2>
-      <p class="section-sub">Точная идентификация пациента на всех этапах, контроль выполнения назначений и защита данных.</p>
-    </div>
-
-    <div class="acc-list">
-      <div class="acc-item">
-        <div class="acc-head">
-          <div class="acc-head-left"><span class="acc-icon">🆔</span><h3>Идентификация пациента</h3></div>
-          <span class="acc-plus">+</span>
-        </div>
-        <div class="acc-body">
-          <p>Браслеты со штрих-кодом на всех этапах.</p>
-          <ul>
-            <li>Использование браслетов со штрих-кодом</li>
-            <li>Сканирование при заборе биоматериала</li>
-            <li>Подтверждение личности перед процедурой</li>
-            <li>Снижение риска врачебных ошибок</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="acc-item">
-        <div class="acc-head">
-          <div class="acc-head-left"><span class="acc-icon">✅</span><h3>Контроль выполнения назначений</h3></div>
-          <span class="acc-plus">+</span>
-        </div>
-        <div class="acc-body">
-          <p>Подтверждение каждой манипуляции через сканирование.</p>
-          <ul>
-            <li>Сканирование браслета пациента</li>
-            <li>Сканирование упаковки препарата</li>
-            <li>Подтверждение выдачи лекарства</li>
-            <li>Проверка соответствия «пациент — препарат»</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="acc-item">
-        <div class="acc-head">
-          <div class="acc-head-left"><span class="acc-icon">⚠️</span><h3>Сигнальная информация о пациенте</h3></div>
-          <span class="acc-plus">+</span>
-        </div>
-        <div class="acc-body">
-          <p>Важные отметки, видимые врачу.</p>
-          <ul>
-            <li>Маломобильный пациент</li>
-            <li>Прикрепление к медорганизации</li>
-            <li>Критическое снижение СКФ</li>
-            <li>Пациент из льготной категории</li>
-            <li>Лекарственная непереносимость</li>
-            <li>Состояние диспансеризации</li>
-            <li>Диспансерное наблюдение</li>
-            <li>Подозрение на онкозаболевание</li>
-            <li>Необходимость флюорографии</li>
-            <li>Нет этапного эпикриза в срок</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="acc-item">
-        <div class="acc-head">
-          <div class="acc-head-left"><span class="acc-icon">📊</span><h3>Оценка рисков</h3></div>
-          <span class="acc-plus">+</span>
-        </div>
-        <div class="acc-body">
-          <p>Автоматический расчёт рисков для пациента.</p>
-          <ul>
-            <li>Риск падений</li>
-            <li>Потеря веса более 5%</li>
-            <li>Риск тромбоэмболических осложнений и венозных тромбозов</li>
-            <li>Риск развития пролежней</li>
-            <li>Тяжесть повреждений</li>
-            <li>Наличие полирезистентной микрофлоры</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="acc-item">
-        <div class="acc-head">
-          <div class="acc-head-left"><span class="acc-icon">🚨</span><h3>Тревожные результаты</h3></div>
-          <span class="acc-plus">+</span>
-        </div>
-        <div class="acc-body">
-          <p>Уведомление о критических лабораторных показателях.</p>
-          <ul>
-            <li>Автоматическая отметка «тревожный результат»</li>
-            <li>Уведомление лечащего врача</li>
-            <li>Возможность ознакомления или отложения</li>
-            <li>Пример: калий 15,00 ммоль/л (норма 3,50–5,50)</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="acc-item">
-        <div class="acc-head">
-          <div class="acc-head-left"><span class="acc-icon">🛡️</span><h3>Соответствие требованиям</h3></div>
-          <span class="acc-plus">+</span>
-        </div>
-        <div class="acc-body">
-          <p>Сертификация и соответствие нормативам РФ.</p>
-          <ul>
-            <li>Регистрационное удостоверение № РЗН 2019/9419</li>
-            <li>Единый реестр российского ПО (№ 916)</li>
-            <li>Требования к МИС Минздрава РФ</li>
-            <li>ГОСТ Р 52636-2006 «Электронная история болезни»</li>
-            <li>152-ФЗ «О персональных данных»</li>
-            <li>Приказ Минздрава №911н</li>
-            <li>Сертификат совместимости с Astra Linux</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ АНАЛИТИКА ============ -->
-<section id="analytics">
-  <div class="container">
-    <div class="center">
-      <span class="section-tag">Аналитика</span>
-      <h2 class="section-title">Мониторинги и отчётность</h2>
-      <p class="section-sub">Полная картина работы клиники в реальном времени и автоматическая отчётность для руководителя.</p>
-    </div>
-
-    <div class="acc-list">
-      <div class="acc-item">
-        <div class="acc-head">
-          <div class="acc-head-left"><span class="acc-icon">🏥</span><h3>Мониторинг коечного фонда</h3></div>
-          <span class="acc-plus">+</span>
-        </div>
-        <div class="acc-body">
-          <p>Загрузка коек по отделениям и в динамике.</p>
-          <ul>
-            <li>Общая загрузка стационара</li>
-            <li>Данные по каждому отделению</li>
-            <li>Визуализация состояния коек</li>
-            <li>Оперативное реагирование</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="acc-item">
-        <div class="acc-head">
-          <div class="acc-head-left"><span class="acc-icon">👨‍⚕️</span><h3>Загрузка специалистов</h3></div>
-          <span class="acc-plus">+</span>
-        </div>
-        <div class="acc-body">
-          <p>Работа консультативной службы.</p>
-          <ul>
-            <li>Количество приёмов по врачам</li>
-            <li>Загрузка кабинетов</li>
-            <li>Мониторинг по услугам</li>
-            <li>Расписание и занятость</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="acc-item">
-        <div class="acc-head">
-          <div class="acc-head-left"><span class="acc-icon">🔪</span><h3>Хирургическая работа</h3></div>
-          <span class="acc-plus">+</span>
-        </div>
-        <div class="acc-body">
-          <p>Мониторинг операций и осложнений.</p>
-          <ul>
-            <li>Назначено, отменено, выполнено</li>
-            <li>Плановые и экстренные операции</li>
-            <li>Причины отмены</li>
-            <li>По виду субкатегории</li>
-            <li>По виду анестезии</li>
-            <li>По операционному залу</li>
-            <li>Контроль послеоперационных осложнений</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="acc-item">
-        <div class="acc-head">
-          <div class="acc-head-left"><span class="acc-icon">💰</span><h3>Финансовый анализ</h3></div>
-          <span class="acc-plus">+</span>
-        </div>
-        <div class="acc-body">
-          <p>Объёмы услуг по источникам финансирования.</p>
-          <ul>
-            <li>ОМС, ДМС, ВМП, наличные, ФСС</li>
-            <li>Реестр пролеченных больных</li>
-            <li>Баланс дохода и себестоимости по случаю</li>
-            <li>Выявление случаев с отрицательным балансом</li>
-            <li>Финансовая карточка случая</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="acc-item">
-        <div class="acc-head">
-          <div class="acc-head-left"><span class="acc-icon">✅</span><h3>Экспертиза качества</h3></div>
-          <span class="acc-plus">+</span>
-        </div>
-        <div class="acc-body">
-          <p>Протоколы и автоматизированная экспертиза.</p>
-          <ul>
-            <li>Протокол экспертизы качества медпомощи</li>
-            <li>Коэффициент качества (0 – 1)</li>
-            <li>Автоматизированная экспертиза по приказу 203н</li>
-            <li>Оценка по критериям (выполнено / не выполнено)</li>
-            <li>Регистрация неблагоприятных событий</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="acc-item">
-        <div class="acc-head">
-          <div class="acc-head-left"><span class="acc-icon">📋</span><h3>Экспертиза нетрудоспособности</h3></div>
-          <span class="acc-plus">+</span>
-        </div>
-        <div class="acc-body">
-          <p>Работа с листами нетрудоспособности.</p>
-          <ul>
-            <li>Случаи временной нетрудоспособности</li>
-            <li>Направление на ВК и МСЭ</li>
-            <li>Номер бланка и дата выдачи</li>
-            <li>Причина нетрудоспособности и диагноз</li>
-            <li>Сводка по листам и врачам</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="acc-item">
-        <div class="acc-head">
-          <div class="acc-head-left"><span class="acc-icon">📊</span><h3>Анализ данных по эпизодам</h3></div>
-          <span class="acc-plus">+</span>
-        </div>
-        <div class="acc-body">
-          <p>Гибкие выборки и сохранённые условия.</p>
-          <ul>
-            <li>Новые, действующие, поступления</li>
-            <li>Выписки и направления</li>
-            <li>Диагнозы и результаты лечения</li>
-            <li>Графики и диаграммы</li>
-            <li>Архив и печать выборок</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="acc-item">
-        <div class="acc-head">
-          <div class="acc-head-left"><span class="acc-icon">📈</span><h3>Реестр пролеченных больных</h3></div>
-          <span class="acc-plus">+</span>
-        </div>
-        <div class="acc-body">
-          <p>Полный реестр с финансовыми показателями.</p>
-          <ul>
-            <li>№ п/п, отделение, ФИО пациента</li>
-            <li>Вид оплаты, дата поступления и выписки</li>
-            <li>Койко-дни, стоимость пребывания</li>
-            <li>Реанимация, операции, наркоз</li>
-            <li>Медикаменты по источникам</li>
-            <li>Итог и баланс по каждому случаю</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="acc-item">
-        <div class="acc-head">
-          <div class="acc-head-left"><span class="acc-icon">📑</span><h3>Статистическая отчётность</h3></div>
-          <span class="acc-plus">+</span>
-        </div>
-        <div class="acc-body">
-          <p>Федеральные формы в электронном виде.</p>
-          <ul>
-            <li>Форма №12 «Сведения о числе заболеваний»</li>
-            <li>Формы Росстата и Минздрава</li>
-            <li>Возможность предоставления в электронном виде</li>
-            <li>Годовые и периодические отчёты</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ КЛИЕНТЫ ============ -->
 <section id="clients" class="alt">
   <div class="container">
     <div class="center">
       <span class="section-tag">Клиенты</span>
-      <h2 class="section-title">Регионы присутствия в РФ</h2>
+      <h2 class="section-title">Масштаб внедрения qMS</h2>
       <p class="section-sub">qMS внедрена более чем в 300 клиниках, больницах и лабораториях по всей России.</p>
     </div>
 
@@ -1516,7 +1475,6 @@ section.alt{background:var(--light)}
     </div>
   </div>
 </section>
-
 <script>
 /* Бургер-меню */
 const burger=document.getElementById('burger');
@@ -1544,5 +1502,6 @@ const observer=new IntersectionObserver(entries=>{
 },{rootMargin:'-40% 0px -55% 0px'});
 sections.forEach(s=>observer.observe(s));
 </script>
+
 
 </body></html>
