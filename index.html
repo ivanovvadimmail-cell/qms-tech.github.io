@@ -3,7 +3,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>qMS — медицинские информационные системы | GMS Tech</title>
-<meta name="description" content="МИС qMS — единая цифровая среда для государственных и коммерческих клиник, а также лабораторная информационная система LIS.">
+<meta name="description" content="МИС qMS — единая цифровая среда для государственных и коммерческих клиник, лабораторная ИС, АИС СЗН, система ранней помощи и реабилитации.">
 <style>
 :root{
   --primary:#0b5e7c;--primary-dark:#07455b;--primary-light:#e6f2f7;
@@ -156,7 +156,7 @@ header{background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom
 }
 .card-btn:hover::after{transform:translateX(2px)}
 
-/* Варианты цветов для трёх карточек */
+/* Варианты цветов для карточек */
 .card.gov .card-label{color:#0b5e7c}
 .card.gov .card-btn{background:#0b5e7c}
 .card.gov .card-btn:hover{background:#12b5d0}
@@ -169,10 +169,25 @@ header{background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom
 .card.lis .card-btn{background:#8a4bd6}
 .card.lis .card-btn:hover{background:#a86ae8}
 
+.card.szn .card-label{color:#c47b00}
+.card.szn .card-btn{background:#c47b00}
+.card.szn .card-btn:hover{background:#e09900}
+
+.card.early .card-label{color:#d94a7a}
+.card.early .card-btn{background:#d94a7a}
+.card.early .card-btn:hover{background:#e8709a}
+
+.card.rehab .card-label{color:#0f8fa8}
+.card.rehab .card-btn{background:#0f8fa8}
+.card.rehab .card-btn:hover{background:#12b5d0}
+
 /* ============ ADAPTIVE ============ */
 @media(max-width:1000px){
-  .cards-grid{grid-template-columns:1fr;max-width:560px;margin:0 auto}
+  .cards-grid{grid-template-columns:repeat(2,1fr)}
   .hero h1{font-size:34px}
+}
+@media(max-width:640px){
+  .cards-grid{grid-template-columns:1fr;max-width:560px;margin:0 auto}
 }
 @media(max-width:768px){
   .hero{padding:36px 0 28px}
@@ -189,8 +204,8 @@ header{background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom
 <body>
 
 <!-- ============ HERO ============ -->
-<section class="hero"><div class="container hero-inner"><h1>Единая цифровая среда <span>для любой клиники</span></h1>
-    <p class="lead">Готовые решения под задачи государственных учреждений, коммерческих клиник и лабораторий. Выберите подходящий продукт и перейдите к подробному описанию.</p>
+<section class="hero"><div class="container hero-inner"><h1>Единая цифровая среда <span>для любой организации</span></h1>
+    <p class="lead">Готовые решения для государственных учреждений, коммерческих клиник, лабораторий, социальных служб и центров реабилитации. Выберите подходящий продукт и перейдите к подробному описанию.</p>
   </div>
 </section>
 
@@ -253,6 +268,63 @@ header{background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom
             <li>Контроль качества и тревожные значения</li>
           </ul>
           <a href="/lis/" class="card-btn">Перейти в раздел</a>
+        </div>
+      </div>
+
+      <!-- АИС СЗН -->
+      <div class="card szn">
+        <div class="card-top placeholder">
+          <span class="big-icon">🤝</span>
+        </div>
+        <div class="card-body">
+          <span class="card-label">Социальной защите</span>
+          <h3>АИС СЗН</h3>
+          <p>Автоматизированная информационно-аналитическая система для органов социальной защиты населения. Полный учёт мер поддержки и получателей.</p>
+          <ul class="card-features">
+            <li>Учёт получателей и мер соцподдержки</li>
+            <li>Расчёт и назначение выплат</li>
+            <li>Интеграция с ЕГИССО и СФР</li>
+            <li>Аналитика и отчётность для региона</li>
+          </ul>
+          <a href="/szn/" class="card-btn">Перейти в раздел</a>
+        </div>
+      </div>
+
+      <!-- Ранняя помощь -->
+      <div class="card early">
+        <div class="card-top placeholder">
+          <span class="big-icon">👶</span>
+        </div>
+        <div class="card-body">
+          <span class="card-label">Ранней помощи</span>
+          <h3>Ранняя помощь детям и их семьям</h3>
+          <p>Информационная система поддержки служб ранней помощи. Ведение случаев, межведомственное взаимодействие и сопровождение семей.</p>
+          <ul class="card-features">
+            <li>Ведение случаев и маршрутов помощи</li>
+            <li>Межведомственное взаимодействие</li>
+            <li>Оценка развития ребёнка и динамика</li>
+            <li>Работа с семьями и специалистами</li>
+          </ul>
+          <a href="/early/" class="card-btn">Перейти в раздел</a>
+        </div>
+      </div>
+
+      <!-- qMS Реабилитация -->
+      <div class="card rehab">
+        <div class="card-top placeholder">
+          <span class="big-icon">🦾</span>
+        </div>
+        <div class="card-body">
+          <span class="card-label">Реабилитации</span>
+          <h3>qMS Реабилитация</h3>
+          <p>Система управления восстановительным лечением. Планирование, контроль и оценка эффективности реабилитационных программ.</p>
+          <ul class="card-features">
+            <li>Индивидуальные планы реабилитации</li>
+            <li>Мультидисциплинарная команда</li>
+            <li>Шкалы и оценка динамики состояния</li>
+            <li>Контроль эффективности программ</li>
+          </ul>
+          <a href="/rehab/" class="card-btn">Перейти в раздел</a>
         </div>
       </div>
 
