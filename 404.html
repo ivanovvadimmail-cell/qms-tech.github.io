@@ -1,20 +1,811 @@
-async function decryptSite(password) {
+<!DOCTYPE html>
 
-    const qmsUrl = new URL(
-        "qms.dat",
-        document.baseURI
-    ).href;
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
 
-    console.log("Загрузка:", qmsUrl);
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    const response = await fetch(
-        qmsUrl,
+<meta name="robots"
+   content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+
+<title>qMS</title>
+
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background: #ffffff;
+}
+
+#login {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    z-index: 999999;
+}
+
+.login-box {
+    width: min(420px, calc(100% - 40px));
+    box-sizing: border-box;
+    padding: 35px;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 10px 40px rgba(0,0,0,.12);
+    text-align: center;
+}
+
+.login-box h1 {
+    margin: 0 0 10px;
+    font-size: 28px;
+}
+
+.login-box p {
+    margin: 0 0 25px;
+    color: #666;
+}
+
+.login-box input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    outline: none;
+}
+
+.login-box button {
+    width: 100%;
+    margin-top: 14px;
+    padding: 14px;
+    border: 0;
+    border-radius: 8px;
+    background: #111;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.login-box button:hover {
+    opacity: .9;
+}
+
+#error {
+    display: none;
+    margin-top: 15px;
+    color: #c00;
+    font-size: 14px;
+    white-space: pre-wrap;
+}
+
+#content {
+    display: none;
+    width: 100%;
+    min-height: 100%;
+}
+</style>
+
+</head>
+
+<body>
+
+<div id="login">
+
+```
+<div class="login-box">
+
+    <h1>qMS</h1>
+
+    <p>Введите ключ доступа</p>
+
+    <input
+        id="password"
+        type="password"
+        autocomplete="off"
+        placeholder="Ключ доступа"
+    >
+
+    <button id="loginButton">
+        Войти
+    </button>
+
+    <div id="error"></div>
+
+</div>
+```
+
+</div>
+
+<div id="content"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js"></script>
+
+<script>
+
+"use strict";
+
+let files = {};
+let blobUrls = {};
+let unlocked = false;
+
+
+/* -------------------------------------------------------
+   PBKDF2 → AES-256-GCM
+------------------------------------------------------- */
+
+async function deriveKey(password, salt) {
+
+    const encoder = new TextEncoder();
+
+    const passwordKey =
+        await crypto.subtle.importKey(
+            "raw",
+            encoder.encode(password),
+            "PBKDF2",
+            false,
+            ["deriveKey"]
+        );
+
+    return await crypto.subtle.deriveKey(
         {
-            cache: "no-store"
+            name: "PBKDF2",
+            salt: salt,
+            iterations: 310000,
+            hash: "SHA-256"
+        },
+        passwordKey,
+        {
+            name: "AES-GCM",
+            length: 256
+        },
+        false,
+        ["decrypt"]
+    );
+}
+
+
+/* -------------------------------------------------------
+   MIME
+------------------------------------------------------- */
+
+function mimeType(path) {
+
+    const ext =
+        path.split(".").pop().toLowerCase();
+
+    const map = {
+
+        html: "text/html",
+        htm: "text/html",
+
+        css: "text/css",
+
+        js: "application/javascript",
+        mjs: "application/javascript",
+
+        json: "application/json",
+
+        png: "image/png",
+        jpg: "image/jpeg",
+        jpeg: "image/jpeg",
+        gif: "image/gif",
+        webp: "image/webp",
+        svg: "image/svg+xml",
+        ico: "image/x-icon",
+
+        woff: "font/woff",
+        woff2: "font/woff2",
+        ttf: "font/ttf",
+        otf: "font/otf",
+
+        mp4: "video/mp4",
+        webm: "video/webm",
+
+        mp3: "audio/mpeg",
+        wav: "audio/wav"
+    };
+
+    return map[ext] || "application/octet-stream";
+}
+
+
+/* -------------------------------------------------------
+   Нормализация пути
+------------------------------------------------------- */
+
+function normalizePath(path) {
+
+    path = path.split("?")[0];
+    path = path.split("#")[0];
+
+    path = path.replace(/\\/g, "/");
+
+    const parts = [];
+
+    for (const part of path.split("/")) {
+
+        if (!part || part === ".")
+            continue;
+
+        if (part === "..") {
+
+            if (parts.length)
+                parts.pop();
+
+            continue;
+        }
+
+        parts.push(part);
+    }
+
+    return parts.join("/");
+}
+
+
+/* -------------------------------------------------------
+   Найти файл
+------------------------------------------------------- */
+
+function findFile(path) {
+
+    path = normalizePath(path);
+
+    if (files[path])
+        return path;
+
+    if (path.startsWith("./"))
+        path = path.substring(2);
+
+    if (files[path])
+        return path;
+
+    return null;
+}
+
+
+/* -------------------------------------------------------
+   Blob URLs
+------------------------------------------------------- */
+
+function createBlobUrls() {
+
+    blobUrls = {};
+
+    for (const path in files) {
+
+        const data = files[path];
+
+        const blob = new Blob(
+            [data],
+            {
+                type: mimeType(path)
+            }
+        );
+
+        blobUrls[path] =
+            URL.createObjectURL(blob);
+    }
+}
+
+
+/* -------------------------------------------------------
+   CSS
+------------------------------------------------------- */
+
+function processCss(css, cssPath) {
+
+    return css.replace(
+        /url\(\s*(['"]?)(.*?)\1\s*\)/gi,
+        function(match, quote, url) {
+
+            if (
+                !url ||
+                url.startsWith("data:") ||
+                url.startsWith("http://") ||
+                url.startsWith("https://") ||
+                url.startsWith("#")
+            ) {
+                return match;
+            }
+
+            const base =
+                cssPath.substring(
+                    0,
+                    cssPath.lastIndexOf("/") + 1
+                );
+
+            const target =
+                normalizePath(base + url);
+
+            if (blobUrls[target]) {
+
+                return "url('" +
+                    blobUrls[target] +
+                    "')";
+            }
+
+            return match;
         }
     );
+}
+
+
+/* -------------------------------------------------------
+   Обработка CSS
+------------------------------------------------------- */
+
+function processAllCss() {
+
+    for (const path in files) {
+
+        if (!path.toLowerCase().endsWith(".css"))
+            continue;
+
+        const original =
+            new TextDecoder().decode(
+                files[path]
+            );
+
+        const processed =
+            processCss(
+                original,
+                path
+            );
+
+        files[path] =
+            new TextEncoder().encode(
+                processed
+            );
+
+        const blob =
+            new Blob(
+                [files[path]],
+                {
+                    type: "text/css"
+                }
+            );
+
+        if (blobUrls[path])
+            URL.revokeObjectURL(
+                blobUrls[path]
+            );
+
+        blobUrls[path] =
+            URL.createObjectURL(blob);
+    }
+}
+
+
+/* -------------------------------------------------------
+   Определить текущую страницу
+------------------------------------------------------- */
+
+function getCurrentPage() {
+
+    let path =
+        window.location.pathname;
+
+    /*
+       Для localhost:
+
+       /
+       /gov/
+       /com/
+       и т.д.
+    */
+
+    path =
+        decodeURIComponent(path);
+
+    path =
+        path.replace(/^\/+/, "");
+
+    /*
+       Убираем возможную директорию
+       GitHub Pages.
+    */
+
+    const parts =
+        path.split("/");
+
+    /*
+       Если страница открыта как
+       /qms-tech.github.io/gov/
+       убираем имя репозитория.
+    */
+
+    if (
+        parts.length &&
+        (
+            parts[0] === "qms-tech.github.io"
+        )
+    ) {
+        parts.shift();
+    }
+
+    path = parts.join("/");
+
+    if (!path || path.endsWith("/"))
+        path += "index.html";
+
+    if (!path.endsWith(".html"))
+        path += "/index.html";
+
+    path = normalizePath(path);
+
+    return path;
+}
+
+
+/* -------------------------------------------------------
+   Обработка HTML
+------------------------------------------------------- */
+
+function processHtml(html, pagePath) {
+
+    const parser =
+        new DOMParser();
+
+    const doc =
+        parser.parseFromString(
+            html,
+            "text/html"
+        );
+
+
+    /* CSS */
+
+    doc.querySelectorAll(
+        'link[href]'
+    ).forEach(function(link) {
+
+        const href =
+            link.getAttribute("href");
+
+        if (!href)
+            return;
+
+        if (
+            href.startsWith("http://") ||
+            href.startsWith("https://") ||
+            href.startsWith("//") ||
+            href.startsWith("data:")
+        )
+            return;
+
+        const base =
+            pagePath.substring(
+                0,
+                pagePath.lastIndexOf("/") + 1
+            );
+
+        const target =
+            normalizePath(
+                base + href
+            );
+
+        if (blobUrls[target]) {
+
+            link.setAttribute(
+                "href",
+                blobUrls[target]
+            );
+        }
+    });
+
+
+    /* Картинки */
+
+    doc.querySelectorAll(
+        "img[src]"
+    ).forEach(function(img) {
+
+        const src =
+            img.getAttribute("src");
+
+        if (!src)
+            return;
+
+        if (
+            src.startsWith("http://") ||
+            src.startsWith("https://") ||
+            src.startsWith("data:")
+        )
+            return;
+
+        const base =
+            pagePath.substring(
+                0,
+                pagePath.lastIndexOf("/") + 1
+            );
+
+        const target =
+            normalizePath(
+                base + src
+            );
+
+        if (blobUrls[target]) {
+
+            img.setAttribute(
+                "src",
+                blobUrls[target]
+            );
+        }
+    });
+
+
+    /* Видео */
+
+    doc.querySelectorAll(
+        "video[src], source[src]"
+    ).forEach(function(el) {
+
+        const src =
+            el.getAttribute("src");
+
+        if (!src)
+            return;
+
+        const base =
+            pagePath.substring(
+                0,
+                pagePath.lastIndexOf("/") + 1
+            );
+
+        const target =
+            normalizePath(
+                base + src
+            );
+
+        if (blobUrls[target]) {
+
+            el.setAttribute(
+                "src",
+                blobUrls[target]
+            );
+        }
+    });
+
+
+    /* Внутренние ссылки */
+
+    doc.querySelectorAll(
+        "a[href]"
+    ).forEach(function(a) {
+
+        const href =
+            a.getAttribute("href");
+
+        if (!href)
+            return;
+
+        if (
+            href.startsWith("#") ||
+            href.startsWith("http://") ||
+            href.startsWith("https://") ||
+            href.startsWith("mailto:")
+        )
+            return;
+
+        let target =
+            href.split("?")[0]
+                .split("#")[0];
+
+        const base =
+            pagePath.substring(
+                0,
+                pagePath.lastIndexOf("/") + 1
+            );
+
+        target =
+            normalizePath(
+                base + target
+            );
+
+        if (
+            target.endsWith("/")
+        ) {
+            target += "index.html";
+        }
+
+        if (
+            files[target]
+        ) {
+
+            a.setAttribute(
+                "href",
+                "#/" + target
+            );
+        }
+    });
+
+
+    /*
+       Удаляем старые script,
+       чтобы не запускать их дважды.
+    */
+
+    doc.querySelectorAll(
+        "script"
+    ).forEach(function(script) {
+
+        script.remove();
+    });
+
+
+    return doc;
+}
+
+
+/* -------------------------------------------------------
+   Выполнение страницы
+------------------------------------------------------- */
+
+async function renderPage(pagePath) {
+
+    const actual =
+        findFile(pagePath);
+
+    if (!actual) {
+
+        throw new Error(
+            "Страница не найдена в qms.dat: " +
+            pagePath
+        );
+    }
+
+    const html =
+        new TextDecoder().decode(
+            files[actual]
+        );
+
+    const doc =
+        processHtml(
+            html,
+            actual
+        );
+
+    const content =
+        document.getElementById(
+            "content"
+        );
+
+    content.innerHTML = "";
+
+    /*
+       Переносим содержимое body.
+    */
+
+    Array.from(
+        doc.body.childNodes
+    ).forEach(function(node) {
+
+        content.appendChild(
+            document.importNode(
+                node,
+                true
+            )
+        );
+    });
+
+
+    /*
+       Выполняем JavaScript страницы.
+    */
+
+    const originalScripts =
+        doc.querySelectorAll(
+            "script"
+        );
+
+    for (const script of originalScripts) {
+
+        const newScript =
+            document.createElement(
+                "script"
+            );
+
+        if (script.src) {
+
+            const base =
+                actual.substring(
+                    0,
+                    actual.lastIndexOf("/") + 1
+                );
+
+            const target =
+                normalizePath(
+                    base +
+                    script.getAttribute("src")
+                );
+
+            if (blobUrls[target]) {
+
+                newScript.src =
+                    blobUrls[target];
+            }
+
+        } else {
+
+            newScript.textContent =
+                script.textContent;
+        }
+
+        document.body.appendChild(
+            newScript
+        );
+    }
+}
+
+
+/* -------------------------------------------------------
+   Текущая страница
+------------------------------------------------------- */
+
+async function renderCurrentPage() {
+
+    let page =
+        window.location.hash;
+
+    if (page.startsWith("#/"))
+        page = page.substring(2);
+
+    if (!page) {
+
+        page =
+            getCurrentPage();
+    }
+
+    if (!page.endsWith(".html")) {
+
+        if (page.endsWith("/"))
+            page += "index.html";
+        else
+            page += "/index.html";
+    }
+
+    await renderPage(
+        normalizePath(page)
+    );
+}
+
+
+/* -------------------------------------------------------
+   Расшифровка
+------------------------------------------------------- */
+
+async function decryptSite(password) {
+
+    const qmsUrl =
+        new URL(
+            "qms.dat",
+            document.baseURI
+        ).href;
+
+    console.log(
+        "Загрузка:",
+        qmsUrl
+    );
+
+
+    const response =
+        await fetch(
+            qmsUrl,
+            {
+                cache: "no-store"
+            }
+        );
+
 
     if (!response.ok) {
+
         throw new Error(
             "Не удалось загрузить qms.dat. HTTP " +
             response.status +
@@ -23,43 +814,60 @@ async function decryptSite(password) {
         );
     }
 
-    const data = new Uint8Array(
-        await response.arrayBuffer()
-    );
 
-    const magic = new TextDecoder().decode(
-        data.slice(0, 4)
-    );
+    const data =
+        new Uint8Array(
+            await response.arrayBuffer()
+        );
+
+
+    const magic =
+        new TextDecoder().decode(
+            data.slice(0, 4)
+        );
+
 
     if (magic !== "QMS1") {
+
         throw new Error(
             "qms.dat имеет неправильный формат."
         );
     }
 
-    const salt = data.slice(4, 20);
-    const iv = data.slice(20, 32);
-    const encrypted = data.slice(32);
 
-    const key = await deriveKey(
-        password,
-        salt
-    );
+    const salt =
+        data.slice(4, 20);
+
+    const iv =
+        data.slice(20, 32);
+
+    const encrypted =
+        data.slice(32);
+
+
+    const key =
+        await deriveKey(
+            password,
+            salt
+        );
+
 
     let decrypted;
 
+
     try {
 
-        decrypted = new Uint8Array(
-            await crypto.subtle.decrypt(
-                {
-                    name: "AES-GCM",
-                    iv: iv
-                },
-                key,
-                encrypted
-            )
-        );
+        decrypted =
+            new Uint8Array(
+                await crypto.subtle.decrypt(
+                    {
+                        name: "AES-GCM",
+                        iv: iv
+                    },
+                    key,
+                    encrypted
+                )
+            );
 
     } catch (error) {
 
@@ -68,11 +876,15 @@ async function decryptSite(password) {
         );
     }
 
-    const zip = fflate.unzipSync(
-        decrypted
-    );
+
+    const zip =
+        fflate.unzipSync(
+            decrypted
+        );
+
 
     files = zip;
+
 
     createBlobUrls();
 
@@ -80,11 +892,136 @@ async function decryptSite(password) {
 
     unlocked = true;
 
+
+    document.getElementById(
+        "login"
+    ).style.display = "none";
+
+
+    document.getElementById(
+        "content"
+    ).style.display = "block";
+
+
     history.replaceState(
         {},
         "",
         window.location.pathname
     );
 
+
     await renderCurrentPage();
 }
+
+
+/* -------------------------------------------------------
+   Вход
+------------------------------------------------------- */
+
+async function login() {
+
+    const input =
+        document.getElementById(
+            "password"
+        );
+
+    const error =
+        document.getElementById(
+            "error"
+        );
+
+    error.style.display =
+        "none";
+
+    try {
+
+        await decryptSite(
+            input.value
+        );
+
+    } catch (e) {
+
+        console.error(e);
+
+        error.textContent =
+            e.message ||
+            "Ошибка загрузки.";
+
+        error.style.display =
+            "block";
+    }
+}
+
+
+document.getElementById(
+    "loginButton"
+).addEventListener(
+    "click",
+    login
+);
+
+
+document.getElementById(
+    "password"
+).addEventListener(
+    "keydown",
+    function(e) {
+
+        if (e.key === "Enter")
+            login();
+    }
+);
+
+
+/* -------------------------------------------------------
+   Навигация
+------------------------------------------------------- */
+
+window.addEventListener(
+    "hashchange",
+    async function() {
+
+        if (!unlocked)
+            return;
+
+        try {
+
+            await renderCurrentPage();
+
+        } catch (e) {
+
+            console.error(e);
+        }
+    }
+);
+
+
+/* -------------------------------------------------------
+   Автоматический ключ из URL
+------------------------------------------------------- */
+
+(async function() {
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    const key =
+        params.get("key");
+
+    if (key) {
+
+        document.getElementById(
+            "password"
+        ).value = key;
+
+        await login();
+    }
+
+})();
+
+</script>
+
+</body>
+</html>
