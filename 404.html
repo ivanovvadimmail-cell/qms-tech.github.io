@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 
 <html lang="ru">
+
 <head>
+
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+   content="width=device-width, initial-scale=1.0">
 
 <meta name="robots"
    content="noindex, nofollow, noarchive, nosnippet, noimageindex">
@@ -12,11 +15,13 @@
 <title>qMS</title>
 
 <style>
-html, body {
+
+html,
+body {
     margin: 0;
     padding: 0;
     width: 100%;
-    height: 100%;
+    min-height: 100%;
     font-family: Arial, sans-serif;
     background: #ffffff;
 }
@@ -68,7 +73,7 @@ html, body {
     border: 0;
     border-radius: 8px;
     background: #111;
-    color: white;
+    color: #fff;
     font-size: 16px;
     cursor: pointer;
 }
@@ -88,8 +93,9 @@ html, body {
 #content {
     display: none;
     width: 100%;
-    min-height: 100%;
+    min-height: 100vh;
 }
+
 </style>
 
 </head>
@@ -131,14 +137,19 @@ html, body {
 
 "use strict";
 
+
+/* =======================================================
+   ГЛОБАЛЬНЫЕ ДАННЫЕ
+======================================================= */
+
 let files = {};
 let blobUrls = {};
 let unlocked = false;
 
 
-/* -------------------------------------------------------
+/* =======================================================
    PBKDF2 → AES-256-GCM
-------------------------------------------------------- */
+======================================================= */
 
 async function deriveKey(password, salt) {
 
@@ -171,14 +182,19 @@ async function deriveKey(password, salt) {
 }
 
 
-/* -------------------------------------------------------
+/* =======================================================
    MIME
-------------------------------------------------------- */
+======================================================= */
 
 function mimeType(path) {
 
     const ext =
-        path.split(".").pop().toLowerCase();
+        path
+            .split("?")[0]
+            .split("#")[0]
+            .split(".")
+            .pop()
+            .toLowerCase();
 
     const map = {
 
@@ -212,29 +228,45 @@ function mimeType(path) {
         wav: "audio/wav"
     };
 
-    return map[ext] || "application/octet-stream";
+    return map[ext] ||
+           "application/octet-stream";
 }
 
 
-/* -------------------------------------------------------
-   Нормализация пути
-------------------------------------------------------- */
+/* =======================================================
+   НОРМАЛИЗАЦИЯ ПУТИ
+======================================================= */
 
 function normalizePath(path) {
 
-    path = path.split("?")[0];
-    path = path.split("#")[0];
+    if (!path)
+        return "";
 
-    path = path.replace(/\\/g, "/");
+    path =
+        path.split("?")[0];
+
+    path =
+        path.split("#")[0];
+
+    path =
+        path.replace(/\\/g, "/");
 
     const parts = [];
 
-    for (const part of path.split("/")) {
+    for (
+        const part of path.split("/")
+    ) {
 
-        if (!part || part === ".")
+        if (
+            !part ||
+            part === "."
+        ) {
             continue;
+        }
 
-        if (part === "..") {
+        if (
+            part === ".."
+        ) {
 
             if (parts.length)
                 parts.pop();
@@ -249,45 +281,143 @@ function normalizePath(path) {
 }
 
 
-/* -------------------------------------------------------
-   Найти файл
-------------------------------------------------------- */
+/* =======================================================
+   ОПРЕДЕЛИТЬ ЦЕЛЕВОЙ ФАЙЛ
+======================================================= */
+
+function resolveResource(
+    resource,
+    currentPage
+) {
+
+    if (!resource)
+        return null;
+
+    resource =
+        resource.trim();
+
+    if (
+        resource.startsWith("data:") ||
+        resource.startsWith("blob:") ||
+        resource.startsWith("#") ||
+        resource.startsWith("mailto:")
+    ) {
+        return null;
+    }
+
+    if (
+        resource.startsWith("http://") ||
+        resource.startsWith("https://") ||
+        resource.startsWith("//")
+    ) {
+        return null;
+    }
+
+    /*
+       Абсолютный виртуальный путь:
+
+       /gov/images/a.png
+       /com/style.css
+    */
+
+    if (
+        resource.startsWith("/")
+    ) {
+
+        return normalizePath(
+            resource
+        );
+    }
+
+    /*
+       Относительный путь:
+
+       images/a.png
+       ../images/a.png
+    */
+
+    const base =
+        currentPage.includes("/")
+            ? currentPage.substring(
+                0,
+                currentPage.lastIndexOf("/") + 1
+              )
+            : "";
+
+    return normalizePath(
+        base + resource
+    );
+}
+
+
+/* =======================================================
+   НАЙТИ ФАЙЛ В АРХИВЕ
+======================================================= */
 
 function findFile(path) {
 
-    path = normalizePath(path);
+    path =
+        normalizePath(path);
 
-    if (files[path])
+    if (
+        Object.prototype.hasOwnProperty.call(
+            files,
+            path
+        )
+    ) {
         return path;
+    }
 
-    if (path.startsWith("./"))
-        path = path.substring(2);
+    /*
+       Если это директория,
+       пробуем index.html.
+    */
 
-    if (files[path])
-        return path;
+    if (
+        !path.endsWith(".html")
+    ) {
+
+        const indexPath =
+            path
+                ? path + "/index.html"
+                : "index.html";
+
+        if (
+            Object.prototype.hasOwnProperty.call(
+                files,
+                indexPath
+            )
+        ) {
+            return indexPath;
+        }
+    }
 
     return null;
 }
 
 
-/* -------------------------------------------------------
-   Blob URLs
-------------------------------------------------------- */
+/* =======================================================
+   СОЗДАНИЕ BLOB URL
+======================================================= */
 
 function createBlobUrls() {
 
     blobUrls = {};
 
-    for (const path in files) {
+    for (
+        const path in files
+    ) {
 
-        const data = files[path];
+        const data =
+            files[path];
 
-        const blob = new Blob(
-            [data],
-            {
-                type: mimeType(path)
-            }
-        );
+        const blob =
+            new Blob(
+                [data],
+                {
+                    type: mimeType(path)
+                }
+            );
 
         blobUrls[path] =
             URL.createObjectURL(blob);
@@ -295,40 +425,55 @@ function createBlobUrls() {
 }
 
 
-/* -------------------------------------------------------
-   CSS
-------------------------------------------------------- */
+/* =======================================================
+   ОБРАБОТКА CSS
+======================================================= */
 
-function processCss(css, cssPath) {
+function processCss(
+    css,
+    cssPath
+) {
 
     return css.replace(
         /url\(\s*(['"]?)(.*?)\1\s*\)/gi,
-        function(match, quote, url) {
+        function(
+            match,
+            quote,
+            url
+        ) {
+
+            url =
+                url.trim();
 
             if (
                 !url ||
                 url.startsWith("data:") ||
                 url.startsWith("http://") ||
                 url.startsWith("https://") ||
-                url.startsWith("#")
+                url.startsWith("//") ||
+                url.startsWith("#") ||
+                url.startsWith("blob:")
             ) {
+
                 return match;
             }
 
-            const base =
-                cssPath.substring(
-                    0,
-                    cssPath.lastIndexOf("/") + 1
+            const target =
+                resolveResource(
+                    url,
+                    cssPath
                 );
 
-            const target =
-                normalizePath(base + url);
+            if (
+                target &&
+                blobUrls[target]
+            ) {
 
-            if (blobUrls[target]) {
-
-                return "url('" +
+                return (
+                    "url('" +
                     blobUrls[target] +
-                    "')";
+                    "')"
+                );
             }
 
             return match;
@@ -337,21 +482,29 @@ function processCss(css, cssPath) {
 }
 
 
-/* -------------------------------------------------------
-   Обработка CSS
-------------------------------------------------------- */
+/* =======================================================
+   ОБРАБОТКА ВСЕГО CSS
+======================================================= */
 
 function processAllCss() {
 
-    for (const path in files) {
+    for (
+        const path in files
+    ) {
 
-        if (!path.toLowerCase().endsWith(".css"))
+        if (
+            !path
+                .toLowerCase()
+                .endsWith(".css")
+        ) {
             continue;
+        }
 
         const original =
-            new TextDecoder().decode(
-                files[path]
-            );
+            new TextDecoder()
+                .decode(
+                    files[path]
+                );
 
         const processed =
             processCss(
@@ -360,9 +513,19 @@ function processAllCss() {
             );
 
         files[path] =
-            new TextEncoder().encode(
-                processed
+            new TextEncoder()
+                .encode(
+                    processed
+                );
+
+        if (
+            blobUrls[path]
+        ) {
+
+            URL.revokeObjectURL(
+                blobUrls[path]
             );
+        }
 
         const blob =
             new Blob(
@@ -372,83 +535,107 @@ function processAllCss() {
                 }
             );
 
-        if (blobUrls[path])
-            URL.revokeObjectURL(
-                blobUrls[path]
-            );
-
         blobUrls[path] =
-            URL.createObjectURL(blob);
+            URL.createObjectURL(
+                blob
+            );
     }
 }
 
 
-/* -------------------------------------------------------
-   Определить текущую страницу
-------------------------------------------------------- */
+/* =======================================================
+   ТЕКУЩАЯ СТРАНИЦА
+======================================================= */
 
 function getCurrentPage() {
 
-    let path =
-        window.location.pathname;
+    /*
+       Если есть виртуальный hash,
+       используем его.
+    */
+
+    if (
+        window.location.hash
+    ) {
+
+        let hash =
+            window.location.hash
+                .substring(1);
+
+        if (
+            hash.startsWith("/")
+        ) {
+            hash =
+                hash.substring(1);
+        }
+
+        if (hash)
+            return normalizePath(hash);
+    }
 
     /*
-       Для localhost:
+       Обычный URL.
 
-       /
-       /gov/
-       /com/
-       и т.д.
+       Для / используем index.html.
     */
+
+    let path =
+        window.location.pathname;
 
     path =
         decodeURIComponent(path);
 
     path =
-        path.replace(/^\/+/, "");
+        path.replace(
+            /^\/+/,
+            ""
+        );
 
     /*
-       Убираем возможную директорию
-       GitHub Pages.
+       GitHub Pages project path
     */
 
     const parts =
         path.split("/");
 
-    /*
-       Если страница открыта как
-       /qms-tech.github.io/gov/
-       убираем имя репозитория.
-    */
-
     if (
-        parts.length &&
-        (
-            parts[0] === "qms-tech.github.io"
-        )
+        parts[0] ===
+        "qms-tech.github.io"
     ) {
+
         parts.shift();
     }
 
-    path = parts.join("/");
+    path =
+        parts.join("/");
 
-    if (!path || path.endsWith("/"))
+    if (
+        !path ||
+        path.endsWith("/")
+    ) {
+
         path += "index.html";
+    }
 
-    if (!path.endsWith(".html"))
+    if (
+        !path.endsWith(".html")
+    ) {
+
         path += "/index.html";
+    }
 
-    path = normalizePath(path);
-
-    return path;
+    return normalizePath(path);
 }
 
 
-/* -------------------------------------------------------
-   Обработка HTML
-------------------------------------------------------- */
+/* =======================================================
+   ОБРАБОТКА HTML
+======================================================= */
 
-function processHtml(html, pagePath) {
+function processHtml(
+    html,
+    pagePath
+) {
 
     const parser =
         new DOMParser();
@@ -460,198 +647,615 @@ function processHtml(html, pagePath) {
         );
 
 
-    /* CSS */
+    /* ---------------------------------------------------
+       CSS
+    --------------------------------------------------- */
 
     doc.querySelectorAll(
         'link[href]'
-    ).forEach(function(link) {
+    ).forEach(
+        function(link) {
 
-        const href =
-            link.getAttribute("href");
+            const href =
+                link.getAttribute(
+                    "href"
+                );
 
-        if (!href)
-            return;
+            if (!href)
+                return;
 
-        if (
-            href.startsWith("http://") ||
-            href.startsWith("https://") ||
-            href.startsWith("//") ||
-            href.startsWith("data:")
-        )
-            return;
+            const target =
+                resolveResource(
+                    href,
+                    pagePath
+                );
 
-        const base =
-            pagePath.substring(
-                0,
-                pagePath.lastIndexOf("/") + 1
-            );
-
-        const target =
-            normalizePath(
-                base + href
-            );
-
-        if (blobUrls[target]) {
-
-            link.setAttribute(
-                "href",
+            if (
+                target &&
                 blobUrls[target]
-            );
+            ) {
+
+                link.setAttribute(
+                    "href",
+                    blobUrls[target]
+                );
+            }
         }
-    });
+    );
 
 
-    /* Картинки */
+    /* ---------------------------------------------------
+       IMG
+    --------------------------------------------------- */
 
     doc.querySelectorAll(
         "img[src]"
-    ).forEach(function(img) {
+    ).forEach(
+        function(img) {
 
-        const src =
-            img.getAttribute("src");
+            const src =
+                img.getAttribute(
+                    "src"
+                );
 
-        if (!src)
-            return;
+            const target =
+                resolveResource(
+                    src,
+                    pagePath
+                );
 
-        if (
-            src.startsWith("http://") ||
-            src.startsWith("https://") ||
-            src.startsWith("data:")
-        )
-            return;
-
-        const base =
-            pagePath.substring(
-                0,
-                pagePath.lastIndexOf("/") + 1
-            );
-
-        const target =
-            normalizePath(
-                base + src
-            );
-
-        if (blobUrls[target]) {
-
-            img.setAttribute(
-                "src",
+            if (
+                target &&
                 blobUrls[target]
-            );
+            ) {
+
+                img.setAttribute(
+                    "src",
+                    blobUrls[target]
+                );
+            }
         }
-    });
+    );
 
 
-    /* Видео */
+    /* ---------------------------------------------------
+       srcset
+    --------------------------------------------------- */
 
     doc.querySelectorAll(
-        "video[src], source[src]"
-    ).forEach(function(el) {
+        "[srcset]"
+    ).forEach(
+        function(el) {
 
-        const src =
-            el.getAttribute("src");
+            const srcset =
+                el.getAttribute(
+                    "srcset"
+                );
 
-        if (!src)
-            return;
+            if (!srcset)
+                return;
 
-        const base =
-            pagePath.substring(
-                0,
-                pagePath.lastIndexOf("/") + 1
-            );
+            const result =
+                srcset
+                    .split(",")
+                    .map(
+                        function(item) {
 
-        const target =
-            normalizePath(
-                base + src
-            );
+                            const parts =
+                                item.trim()
+                                    .split(/\s+/);
 
-        if (blobUrls[target]) {
+                            const target =
+                                resolveResource(
+                                    parts[0],
+                                    pagePath
+                                );
+
+                            if (
+                                target &&
+                                blobUrls[target]
+                            ) {
+
+                                parts[0] =
+                                    blobUrls[target];
+                            }
+
+                            return parts.join(" ");
+                        }
+                    )
+                    .join(", ");
 
             el.setAttribute(
-                "src",
-                blobUrls[target]
+                "srcset",
+                result
             );
         }
-    });
+    );
 
 
-    /* Внутренние ссылки */
+    /* ---------------------------------------------------
+       VIDEO / AUDIO / SOURCE
+    --------------------------------------------------- */
+
+    doc.querySelectorAll(
+        "video[src], audio[src], source[src]"
+    ).forEach(
+        function(el) {
+
+            const src =
+                el.getAttribute(
+                    "src"
+                );
+
+            const target =
+                resolveResource(
+                    src,
+                    pagePath
+                );
+
+            if (
+                target &&
+                blobUrls[target]
+            ) {
+
+                el.setAttribute(
+                    "src",
+                    blobUrls[target]
+                );
+            }
+        }
+    );
+
+
+    /* ---------------------------------------------------
+       POSTER
+    --------------------------------------------------- */
+
+    doc.querySelectorAll(
+        "[poster]"
+    ).forEach(
+        function(el) {
+
+            const poster =
+                el.getAttribute(
+                    "poster"
+                );
+
+            const target =
+                resolveResource(
+                    poster,
+                    pagePath
+                );
+
+            if (
+                target &&
+                blobUrls[target]
+            ) {
+
+                el.setAttribute(
+                    "poster",
+                    blobUrls[target]
+                );
+            }
+        }
+    );
+
+
+    /* ---------------------------------------------------
+       ВНУТРЕННИЕ ССЫЛКИ
+    --------------------------------------------------- */
 
     doc.querySelectorAll(
         "a[href]"
-    ).forEach(function(a) {
+    ).forEach(
+        function(a) {
 
-        const href =
-            a.getAttribute("href");
+            const href =
+                a.getAttribute(
+                    "href"
+                );
 
-        if (!href)
-            return;
+            if (!href)
+                return;
 
-        if (
-            href.startsWith("#") ||
-            href.startsWith("http://") ||
-            href.startsWith("https://") ||
-            href.startsWith("mailto:")
-        )
-            return;
+            if (
+                href.startsWith("#")
+            ) {
+                return;
+            }
 
-        let target =
-            href.split("?")[0]
-                .split("#")[0];
+            if (
+                href.startsWith(
+                    "javascript:"
+                )
+            ) {
+                return;
+            }
 
-        const base =
-            pagePath.substring(
-                0,
-                pagePath.lastIndexOf("/") + 1
-            );
+            if (
+                href.startsWith(
+                    "mailto:"
+                )
+            ) {
+                return;
+            }
 
-        target =
-            normalizePath(
-                base + target
-            );
+            if (
+                href.startsWith(
+                    "tel:"
+                )
+            ) {
+                return;
+            }
 
-        if (
-            target.endsWith("/")
-        ) {
-            target += "index.html";
+            if (
+                href.startsWith(
+                    "http://"
+                ) ||
+                href.startsWith(
+                    "https://"
+                ) ||
+                href.startsWith("//")
+            ) {
+                return;
+            }
+
+
+            let cleanHref =
+                href.split("?")[0]
+                    .split("#")[0];
+
+            const target =
+                resolveResource(
+                    cleanHref,
+                    pagePath
+                );
+
+            if (!target)
+                return;
+
+
+            let pageTarget =
+                target;
+
+            /*
+               Ссылка на каталог:
+               gov/
+               com/
+               и т.д.
+            */
+
+            if (
+                pageTarget.endsWith("/")
+            ) {
+
+                pageTarget +=
+                    "index.html";
+            }
+
+            /*
+               Если такого файла нет,
+               проверяем index.html
+            */
+
+            const resolved =
+                findFile(
+                    pageTarget
+                );
+
+            if (
+                resolved
+            ) {
+
+                let hash =
+                    "#/" +
+                    resolved;
+
+                /*
+                   Сохраняем fragment
+                */
+
+                const fragment =
+                    href.includes("#")
+                        ? href.substring(
+                            href.indexOf("#")
+                          )
+                        : "";
+
+                if (fragment)
+                    hash += fragment;
+
+                a.setAttribute(
+                    "href",
+                    hash
+                );
+            }
         }
-
-        if (
-            files[target]
-        ) {
-
-            a.setAttribute(
-                "href",
-                "#/" + target
-            );
-        }
-    });
-
-
-    /*
-       Удаляем старые script,
-       чтобы не запускать их дважды.
-    */
-
-    doc.querySelectorAll(
-        "script"
-    ).forEach(function(script) {
-
-        script.remove();
-    });
+    );
 
 
     return doc;
 }
 
 
-/* -------------------------------------------------------
-   Выполнение страницы
-------------------------------------------------------- */
+/* =======================================================
+   ПОДКЛЮЧЕНИЕ HEAD СТРАНИЦЫ
+======================================================= */
 
-async function renderPage(pagePath) {
+function applyPageHead(
+    doc,
+    pagePath
+) {
+
+    /*
+       Удаляем CSS предыдущей страницы.
+    */
+
+    document
+        .querySelectorAll(
+            "[data-qms-page-head]"
+        )
+        .forEach(
+            function(el) {
+
+                el.remove();
+            }
+        );
+
+
+    /*
+       TITLE
+    */
+
+    const title =
+        doc.querySelector(
+            "title"
+        );
+
+    if (title) {
+
+        document.title =
+            title.textContent;
+    }
+
+
+    /*
+       STYLE
+    */
+
+    doc.querySelectorAll(
+        "style"
+    ).forEach(
+        function(oldStyle) {
+
+            const style =
+                document.createElement(
+                    "style"
+                );
+
+            style.setAttribute(
+                "data-qms-page-head",
+                "1"
+            );
+
+            style.textContent =
+                oldStyle.textContent;
+
+            document.head.appendChild(
+                style
+            );
+        }
+    );
+
+
+    /*
+       LINK STYLESHEET
+    */
+
+    doc.querySelectorAll(
+        'link[rel="stylesheet"]'
+    ).forEach(
+        function(link) {
+
+            const href =
+                link.getAttribute(
+                    "href"
+                );
+
+            if (!href)
+                return;
+
+            const target =
+                resolveResource(
+                    href,
+                    pagePath
+                );
+
+            if (
+                target &&
+                blobUrls[target]
+            ) {
+
+                const newLink =
+                    document.createElement(
+                        "link"
+                    );
+
+                newLink.rel =
+                    "stylesheet";
+
+                newLink.href =
+                    blobUrls[target];
+
+                newLink.setAttribute(
+                    "data-qms-page-head",
+                    "1"
+                );
+
+                document.head.appendChild(
+                    newLink
+                );
+            }
+        }
+    );
+
+
+    /*
+       favicon
+    */
+
+    doc.querySelectorAll(
+        'link[rel="icon"], link[rel="shortcut icon"]'
+    ).forEach(
+        function(link) {
+
+            const href =
+                link.getAttribute(
+                    "href"
+                );
+
+            const target =
+                resolveResource(
+                    href,
+                    pagePath
+                );
+
+            if (
+                target &&
+                blobUrls[target]
+            ) {
+
+                const newLink =
+                    document.createElement(
+                        "link"
+                    );
+
+                newLink.rel =
+                    link.rel;
+
+                newLink.href =
+                    blobUrls[target];
+
+                newLink.setAttribute(
+                    "data-qms-page-head",
+                    "1"
+                );
+
+                document.head.appendChild(
+                    newLink
+                );
+            }
+        }
+    );
+}
+
+
+/* =======================================================
+   ВЫПОЛНЕНИЕ JAVASCRIPT
+======================================================= */
+
+async function executeScripts(
+    doc,
+    pagePath,
+    container
+) {
+
+    const scripts =
+        Array.from(
+            doc.querySelectorAll(
+                "script"
+            )
+        );
+
+    for (
+        const script of scripts
+    ) {
+
+        const newScript =
+            document.createElement(
+                "script"
+            );
+
+
+        /*
+           Внешний JS
+        */
+
+        const src =
+            script.getAttribute(
+                "src"
+            );
+
+        if (src) {
+
+            const target =
+                resolveResource(
+                    src,
+                    pagePath
+                );
+
+            if (
+                target &&
+                blobUrls[target]
+            ) {
+
+                newScript.src =
+                    blobUrls[target];
+
+            } else {
+
+                /*
+                   Внешний интернет-JS
+                   оставляем как есть.
+                */
+
+                newScript.src =
+                    src;
+            }
+
+        } else {
+
+            /*
+               Inline JS
+            */
+
+            newScript.textContent =
+                script.textContent;
+        }
+
+
+        /*
+           Копируем type
+        */
+
+        if (
+            script.type
+        ) {
+
+            newScript.type =
+                script.type;
+        }
+
+
+        container.appendChild(
+            newScript
+        );
+    }
+}
+
+
+/* =======================================================
+   ОТРИСОВКА СТРАНИЦЫ
+======================================================= */
+
+async function renderPage(
+    pagePath
+) {
 
     const actual =
-        findFile(pagePath);
+        findFile(
+            pagePath
+        );
 
     if (!actual) {
 
@@ -661,10 +1265,19 @@ async function renderPage(pagePath) {
         );
     }
 
+
+    console.log(
+        "Открываем страницу:",
+        actual
+    );
+
+
     const html =
-        new TextDecoder().decode(
-            files[actual]
-        );
+        new TextDecoder()
+            .decode(
+                files[actual]
+            );
+
 
     const doc =
         processHtml(
@@ -672,116 +1285,85 @@ async function renderPage(pagePath) {
             actual
         );
 
+
+    /*
+       HEAD
+    */
+
+    applyPageHead(
+        doc,
+        actual
+    );
+
+
+    /*
+       BODY
+    */
+
     const content =
         document.getElementById(
             "content"
         );
 
-    content.innerHTML = "";
+    content.innerHTML =
+        "";
 
-    /*
-       Переносим содержимое body.
-    */
 
     Array.from(
         doc.body.childNodes
-    ).forEach(function(node) {
+    ).forEach(
+        function(node) {
 
-        content.appendChild(
-            document.importNode(
-                node,
-                true
-            )
-        );
-    });
+            content.appendChild(
+                document.importNode(
+                    node,
+                    true
+                )
+            );
+        }
+    );
 
 
     /*
-       Выполняем JavaScript страницы.
+       Скрипты запускаем после
+       построения BODY.
     */
 
-    const originalScripts =
-        doc.querySelectorAll(
-            "script"
-        );
-
-    for (const script of originalScripts) {
-
-        const newScript =
-            document.createElement(
-                "script"
-            );
-
-        if (script.src) {
-
-            const base =
-                actual.substring(
-                    0,
-                    actual.lastIndexOf("/") + 1
-                );
-
-            const target =
-                normalizePath(
-                    base +
-                    script.getAttribute("src")
-                );
-
-            if (blobUrls[target]) {
-
-                newScript.src =
-                    blobUrls[target];
-            }
-
-        } else {
-
-            newScript.textContent =
-                script.textContent;
-        }
-
-        document.body.appendChild(
-            newScript
-        );
-    }
-}
-
-
-/* -------------------------------------------------------
-   Текущая страница
-------------------------------------------------------- */
-
-async function renderCurrentPage() {
-
-    let page =
-        window.location.hash;
-
-    if (page.startsWith("#/"))
-        page = page.substring(2);
-
-    if (!page) {
-
-        page =
-            getCurrentPage();
-    }
-
-    if (!page.endsWith(".html")) {
-
-        if (page.endsWith("/"))
-            page += "index.html";
-        else
-            page += "/index.html";
-    }
-
-    await renderPage(
-        normalizePath(page)
+    await executeScripts(
+        doc,
+        actual,
+        content
     );
 }
 
 
-/* -------------------------------------------------------
-   Расшифровка
-------------------------------------------------------- */
+/* =======================================================
+   ТЕКУЩАЯ СТРАНИЦА
+======================================================= */
 
-async function decryptSite(password) {
+async function renderCurrentPage() {
+
+    const page =
+        getCurrentPage();
+
+    console.log(
+        "Текущая виртуальная страница:",
+        page
+    );
+
+    await renderPage(
+        page
+    );
+}
+
+
+/* =======================================================
+   РАСШИФРОВКА QMS.DAT
+======================================================= */
+
+async function decryptSite(
+    password
+) {
 
     const qmsUrl =
         new URL(
@@ -789,8 +1371,9 @@ async function decryptSite(password) {
             document.baseURI
         ).href;
 
+
     console.log(
-        "Загрузка:",
+        "Загрузка qms.dat:",
         qmsUrl
     );
 
@@ -821,13 +1404,20 @@ async function decryptSite(password) {
         );
 
 
+    /*
+       Проверяем QMS1
+    */
+
     const magic =
-        new TextDecoder().decode(
-            data.slice(0, 4)
-        );
+        new TextDecoder()
+            .decode(
+                data.slice(0, 4)
+            );
 
 
-    if (magic !== "QMS1") {
+    if (
+        magic !== "QMS1"
+    ) {
 
         throw new Error(
             "qms.dat имеет неправильный формат."
@@ -835,15 +1425,36 @@ async function decryptSite(password) {
     }
 
 
+    /*
+       Формат:
+
+       0-3   QMS1
+       4-19  salt
+       20-31 IV
+       32+   encrypted
+    */
+
     const salt =
-        data.slice(4, 20);
+        data.slice(
+            4,
+            20
+        );
 
     const iv =
-        data.slice(20, 32);
+        data.slice(
+            20,
+            32
+        );
 
     const encrypted =
-        data.slice(32);
+        data.slice(
+            32
+        );
 
+
+    /*
+       Получаем AES-256 ключ
+    */
 
     const key =
         await deriveKey(
@@ -877,46 +1488,95 @@ async function decryptSite(password) {
     }
 
 
-    const zip =
-        fflate.unzipSync(
-            decrypted
+    /*
+       Распаковываем ZIP
+    */
+
+    try {
+
+        files =
+            fflate.unzipSync(
+                decrypted
+            );
+
+    } catch (error) {
+
+        throw new Error(
+            "Не удалось распаковать qms.dat."
         );
+    }
 
 
-    files = zip;
+    console.log(
+        "Файлов в архиве:",
+        Object.keys(files).length
+    );
 
+
+    /*
+       Создаём Blob URL
+    */
 
     createBlobUrls();
 
+
+    /*
+       Обрабатываем CSS.
+       Важно: после этого
+       blobUrls CSS обновятся.
+    */
+
     processAllCss();
+
 
     unlocked = true;
 
 
+    /*
+       Показываем сайт
+    */
+
     document.getElementById(
         "login"
-    ).style.display = "none";
-
+    ).style.display =
+        "none";
 
     document.getElementById(
         "content"
-    ).style.display = "block";
+    ).style.display =
+        "block";
 
 
-    history.replaceState(
-        {},
-        "",
-        window.location.pathname
-    );
+    /*
+       Убираем ?key=...
+       из адресной строки.
+    */
 
+    if (
+        window.location.search
+    ) {
+
+        history.replaceState(
+            {},
+            "",
+            window.location.pathname +
+            window.location.hash
+        );
+    }
+
+
+    /*
+       Открываем текущую
+       виртуальную страницу.
+    */
 
     await renderCurrentPage();
 }
 
 
-/* -------------------------------------------------------
-   Вход
-------------------------------------------------------- */
+/* =======================================================
+   ВХОД
+======================================================= */
 
 async function login() {
 
@@ -930,8 +1590,13 @@ async function login() {
             "error"
         );
 
+
     error.style.display =
         "none";
+
+    error.textContent =
+        "";
+
 
     try {
 
@@ -953,6 +1618,10 @@ async function login() {
 }
 
 
+/* =======================================================
+   КНОПКА ВХОДА
+======================================================= */
+
 document.getElementById(
     "loginButton"
 ).addEventListener(
@@ -961,21 +1630,29 @@ document.getElementById(
 );
 
 
+/* =======================================================
+   ENTER
+======================================================= */
+
 document.getElementById(
     "password"
 ).addEventListener(
     "keydown",
     function(e) {
 
-        if (e.key === "Enter")
+        if (
+            e.key === "Enter"
+        ) {
+
             login();
+        }
     }
 );
 
 
-/* -------------------------------------------------------
-   Навигация
-------------------------------------------------------- */
+/* =======================================================
+   HASH НАВИГАЦИЯ
+======================================================= */
 
 window.addEventListener(
     "hashchange",
@@ -988,6 +1665,11 @@ window.addEventListener(
 
             await renderCurrentPage();
 
+            window.scrollTo(
+                0,
+                0
+            );
+
         } catch (e) {
 
             console.error(e);
@@ -996,9 +1678,9 @@ window.addEventListener(
 );
 
 
-/* -------------------------------------------------------
-   Автоматический ключ из URL
-------------------------------------------------------- */
+/* =======================================================
+   АВТОМАТИЧЕСКИЙ ?key=1981
+======================================================= */
 
 (async function() {
 
@@ -1008,13 +1690,16 @@ window.addEventListener(
         );
 
     const key =
-        params.get("key");
+        params.get(
+            "key"
+        );
 
     if (key) {
 
         document.getElementById(
             "password"
-        ).value = key;
+        ).value =
+            key;
 
         await login();
     }
